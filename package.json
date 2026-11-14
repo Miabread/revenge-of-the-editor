@@ -9,9 +9,11 @@
         "preview": "vite preview"
     },
     "devDependencies": {
+        "@tailwindcss/vite": "^4.3.5",
         "@vitejs/plugin-vue": "^6.0.11",
         "oxfmt": "^0.78.0",
         "oxlint": "^1.93.0",
+        "tailwindcss": "^4.3.5",
         "typescript": "~7.0.2",
         "vite": "^8.3.6"
     },
