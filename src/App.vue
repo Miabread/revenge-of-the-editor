@@ -11,12 +11,7 @@ const tabs = ['Panel Phase', 'Doodle Phase'];
 <template>
     <div class="special-background h-screen w-screen overflow-hidden grid grid-cols-[1fr_3fr] grid-rows-[75px_1fr]">
         <header class="col-span-2 bg-stone-50 border-4 border-black m-2 p-2 flex gap-3">
-            <Button
-                v-for="(tab, index) in tabs"
-                :key="tab"
-                :class="{ active: activeTab === index }"
-                @click="activeTab = index"
-            >
+            <Button v-for="(tab, index) in tabs" :key="tab" :active="activeTab === index" @click="activeTab = index">
                 {{ tab }}
             </Button>
         </header>
