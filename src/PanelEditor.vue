@@ -3,7 +3,7 @@ import { Canvas, FabricImage } from 'fabric';
 import { ref, onMounted, onUnmounted } from 'vue';
 import Button from './Button.vue';
 
-const canvasHeight = 575;
+const canvasHeight = 500;
 const canvasWidth = Math.floor(canvasHeight * (16 / 9));
 
 const canvasElement = ref(undefined);

@@ -3,20 +3,25 @@ import { ref } from 'vue';
 import PanelEditor from './PanelEditor.vue';
 import DoodleEditor from './DoodleEditor.vue';
 import Button from './Button.vue';
+import { useRoomCode } from './lib.ts';
 
 const activeTab = ref(0);
 const tabs = ['Panel Phase', 'Doodle Phase'];
+
+const roomCode = useRoomCode();
 </script>
 
 <template>
-    <div class="special-background h-screen w-screen overflow-hidden grid grid-cols-[1fr_3fr] grid-rows-[75px_1fr]">
-        <header class="col-span-2 bg-stone-50 border-4 border-black m-2 p-2 flex gap-3">
+    <div class="special-background h-screen w-screen overflow-hidden grid grid-cols-[1fr_3fr_1fr] grid-rows-[75px_1fr]">
+        <header class="col-span-3 bg-stone-50 border-4 border-black m-2 p-2 flex gap-3">
             <Button v-for="(tab, index) in tabs" :key="tab" :active="activeTab === index" @click="activeTab = index">
                 {{ tab }}
             </Button>
+            {{ roomCode }}
         </header>
         <PanelEditor v-if="activeTab === 0" />
         <DoodleEditor v-else-if="activeTab === 1" />
+        <aside class="flex flex-col gap-3 bg-stone-50 border-4 border-black m-2 p-2 overflow-scroll"></aside>
     </div>
 </template>
 

@@ -3,7 +3,7 @@ import { Canvas, getEnv, PatternBrush, PencilBrush } from 'fabric';
 import { ref, onMounted, onUnmounted, reactive, watch } from 'vue';
 import Button from './Button.vue';
 
-const canvasHeight = 575;
+const canvasHeight = 500;
 const canvasWidth = Math.floor(canvasHeight * (16 / 9));
 
 const canvasElement = ref(undefined);
@@ -81,9 +81,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <aside id="panel-palette" class="flex flex-col gap-3 bg-stone-50 border-4 border-black m-2 p-2 overflow-scroll">
+    <aside class="flex flex-col gap-3 bg-stone-50 border-4 border-black m-2 p-2 overflow-scroll">
         <Button @click="saveAsImage">Save as Image</Button>
-        <div class="grid grid-cols-3 gap-3 px-10">
+        <div class="grid grid-cols-3 gap-3">
             <Button @click="brush.width = 5" class="aspect-square">Small</Button>
             <Button @click="brush.width = 20" class="aspect-square">Medium</Button>
             <Button @click="brush.width = 70" class="aspect-square">Large</Button>
