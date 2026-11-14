@@ -1,124 +1,27 @@
 <script setup lang="ts">
-import { Canvas, FabricImage } from 'fabric';
-import { ref, onMounted, onUnmounted } from 'vue';
-
-const canvasBounds = {
-    width: 600,
-    height: 850,
-};
-
-const canvasElement = ref(undefined);
-let canvas: Canvas | null = null;
-
-const panelPieces = ref([{ url: '/panels/triangle.png' }, { url: '/panels/triangle.png' }]);
-
-const spawnPanelPiece = async (imageUrl: string, dropPoint: { x: number; y: number }) => {
-    if (!canvas) return;
-
-    const image = await FabricImage.fromURL(imageUrl, {
-        crossOrigin: 'anonymous',
-    });
-
-    if (image.width > canvasBounds.width / 2) {
-        image.scaleToWidth(canvasBounds.width / 2);
-    }
-
-    image.set({
-        left: dropPoint.x,
-        top: dropPoint.y,
-        originX: 'center',
-        originY: 'center',
-        perPixelTargetFind: true,
-        targetFindTolerance: 4,
-        cornerColor: '#2563eb',
-        cornerStyle: 'circle',
-        borderColor: '#2563eb',
-        transparentCorners: false,
-        snapAngle: 15,
-    });
-
-    canvas.add(image);
-    canvas.setActiveObject(image);
-    canvas.requestRenderAll();
-};
-
-const handlePalettePickup = (e: DragEvent, panelUrl: string) => {
-    if (!e.dataTransfer) return;
-    e.dataTransfer.setData('text/plain', panelUrl);
-    e.dataTransfer.effectAllowed = 'copy';
-};
-
-const handlePaletteDrop = async (e: DragEvent) => {
-    const imageUrl = e.dataTransfer?.getData('text/plain');
-    if (!imageUrl || !canvas) return;
-
-    const pointer = canvas.getScenePoint(e);
-    await spawnPanelPiece(imageUrl, pointer);
-};
-
-const handleGlobalKeyDown = (e: KeyboardEvent) => {
-    if (!canvas) return;
-    if (e.key === 'Delete' || e.key === 'Backspace') {
-        const active = canvas.getActiveObject();
-        if (active) {
-            canvas.remove(active);
-            canvas.discardActiveObject();
-            canvas.requestRenderAll();
-        }
-    }
-};
-
-const saveAsImage = () => {
-    if (!canvas) return;
-
-    const a = document.createElement('a');
-    a.href = canvas.toDataURL();
-    a.download = 'image.png';
-
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-};
-
-onMounted(() => {
-    canvas = new Canvas(canvasElement.value, {
-        backgroundColor: '#ffffff',
-        preserveObjectStacking: true,
-    });
-
-    window.addEventListener('keydown', handleGlobalKeyDown);
-});
-
-onUnmounted(() => {
-    window.removeEventListener('keydown', handleGlobalKeyDown);
-
-    if (!canvas) return;
-    canvas.dispose();
-    canvas = null;
-});
+import PanelEditor from './PanelEditor.vue';
 </script>
 
 <template>
-    <div class="flex gap-5">
-        <aside id="panel-palette" class="flex w-40 flex-col gap-3">
-            <button @click="saveAsImage" class="border border-gray-600">Save</button>
-            <img
-                v-for="panel in panelPieces"
-                :key="panel.url"
-                draggable="true"
-                @dragstart="handlePalettePickup($event, panel.url)"
-                :src="panel.url"
-                class="width-full cursor-grab border border-gray-600"
-            />
-        </aside>
-
-        <main @dragover.prevent="$event.dataTransfer!.dropEffect = 'copy'" @drop.prevent="handlePaletteDrop($event)">
-            <canvas
-                ref="canvasElement"
-                :width="canvasBounds.width"
-                :height="canvasBounds.height"
-                class="border border-gray-600"
-            ></canvas>
-        </main>
+    <div class="special-background h-screen w-screen overflow-hidden grid grid-cols-[1fr_3fr] grid-rows-[75px_1fr]">
+        <header class="col-span-2 bg-stone-50 border-4 border-black m-2 p-2">Header</header>
+        <PanelEditor />
     </div>
 </template>
+
+<style scoped>
+.special-background {
+    background-image:
+        radial-gradient(
+            circle 5px at top left,
+            rgba(226, 226, 226, 0.1) 0%,
+            rgba(226, 226, 226, 0.1) 50%,
+            rgba(201, 201, 201, 0.1) 50%,
+            rgba(201, 201, 201, 0.1) 30%,
+            transparent 30%,
+            transparent 50%
+        ),
+        linear-gradient(90deg, rgb(51, 51, 51), rgb(51, 51, 51));
+    background-size: 11px 11px;
+}
+</style>
