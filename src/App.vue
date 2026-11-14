@@ -68,6 +68,18 @@ const handleGlobalKeyDown = (e: KeyboardEvent) => {
     }
 };
 
+const saveAsImage = () => {
+    if (!canvas) return;
+
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL();
+    a.download = 'image.png';
+
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+};
+
 onMounted(() => {
     canvas = new Canvas(canvasElement.value, {
         backgroundColor: '#ffffff',
@@ -89,13 +101,14 @@ onUnmounted(() => {
 <template>
     <div class="flex gap-5">
         <aside id="panel-palette" class="flex w-40 flex-col gap-3">
+            <button @click="saveAsImage" class="border border-gray-600">Save</button>
             <img
                 v-for="panel in panelPieces"
                 :key="panel.url"
                 draggable="true"
                 @dragstart="handlePalettePickup($event, panel.url)"
                 :src="panel.url"
-                style="width: 100%; cursor: grab; border: 1px solid #ccc"
+                class="width-full cursor-grab border border-gray-600"
             />
         </aside>
 
@@ -104,7 +117,7 @@ onUnmounted(() => {
                 ref="canvasElement"
                 :width="canvasBounds.width"
                 :height="canvasBounds.height"
-                class="border border-gray-400"
+                class="border border-gray-600"
             ></canvas>
         </main>
     </div>
