@@ -78,31 +78,44 @@ onUnmounted(() => {
     canvas.dispose();
     canvas = null;
 });
+
+const paletteButtons = [
+    { key: 'width', value: 5, label: 'Small' },
+    { key: 'width', value: 20, label: 'Medium' },
+    { key: 'width', value: 70, label: 'Large' },
+    { key: 'style', value: 'solid', label: 'Solid' },
+    { key: 'style', value: 'dots', label: 'Dots' },
+    { key: 'style', value: 'lines', label: 'Lines' },
+    { key: 'color', value: 'black', label: '' },
+    { key: 'color', value: 'white', label: '' },
+    { key: 'color', value: 'grey', label: '' },
+    { key: 'color', value: 'red', label: '' },
+    { key: 'color', value: 'orange', label: '' },
+    { key: 'color', value: 'yellow', label: '' },
+    { key: 'color', value: 'green', label: '' },
+    { key: 'color', value: 'blue', label: '' },
+    { key: 'color', value: 'purple', label: '' },
+] as const;
 </script>
 
 <template>
     <aside class="flex flex-col gap-3 bg-stone-50 border-4 border-black m-2 p-2 overflow-scroll">
         <Button @click="saveAsImage">Save as Image</Button>
         <div class="grid grid-cols-3 gap-3">
-            <Button @click="brush.width = 5" class="aspect-square">Small</Button>
-            <Button @click="brush.width = 20" class="aspect-square">Medium</Button>
-            <Button @click="brush.width = 70" class="aspect-square">Large</Button>
-
-            <Button @click="brush.style = 'solid'" class="aspect-square">Solid</Button>
-            <Button @click="brush.style = 'dots'" class="aspect-square">Dots</Button>
-            <Button @click="brush.style = 'lines'" class="aspect-square">Lines</Button>
-
-            <Button @click="brush.color = 'black'" class="aspect-square bg-black"></Button>
-            <Button @click="brush.color = 'white'" class="aspect-square bg-white"></Button>
-            <Button @click="brush.color = 'grey'" class="aspect-square bg-gray-500"></Button>
-
-            <Button @click="brush.color = 'red'" class="aspect-square bg-red-500"></Button>
-            <Button @click="brush.color = 'orange'" class="aspect-square bg-orange-500"></Button>
-            <Button @click="brush.color = 'yellow'" class="aspect-square bg-yellow-500"></Button>
-
-            <Button @click="brush.color = 'green'" class="aspect-square bg-green-500"></Button>
-            <Button @click="brush.color = 'blue'" class="aspect-square bg-blue-500"></Button>
-            <Button @click="brush.color = 'purple'" class="aspect-square bg-purple-500"></Button>
+            <Button
+                v-for="(button, i) in paletteButtons"
+                :key="i"
+                @click="(brush[button.key] as any) = button.value"
+                :active="brush[button.key] === button.value"
+                class="aspect-square grid place-items-center"
+            >
+                <div
+                    v-if="button.key === 'color'"
+                    :style="{ backgroundColor: button.value }"
+                    class="aspect-square border w-full"
+                ></div>
+                {{ button.label }}
+            </Button>
         </div>
     </aside>
 
