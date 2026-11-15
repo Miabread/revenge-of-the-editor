@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Button from './Button.vue';
-import { paletteButtons, panelPieces, gameStateTitles, playerIcons, tinBg } from './constants.ts';
+import { paletteButtons, panelPieces, gameStateTitles, playerIcons, backgrounds } from './constants.ts';
 import { useGame } from './game.ts';
 
 const {
@@ -28,10 +28,14 @@ const getPlayerIcon = (peerId: string) => {
 <template>
     <div class="special-background font-bangers h-dvh w-dvw overflow-hidden grid grid-cols-[1fr_3fr_1fr] grid-rows-1">
         <aside
-            class="m-2 p-2 bg-center bg-no-repeat bg-size-[125%_100%]"
-            :style="{ backgroundImage: `url('${tinBg.left}')` }"
+            class="m-2 p-2 bg-center bg-no-repeat bg-size-[125%_100%] flex flex-col items-center"
+            :style="{ backgroundImage: `url('${backgrounds.tin_left}')` }"
         >
-            <div v-if="gameState === 'panel'" class="grid grid-cols-2 gap-3 p-5 overflow-scroll h-full">
+            <a href="https://petalcreator.itch.io/revenge-of-the-editor" class="w-1/2 mb-5">
+                <img :src="backgrounds.cover" class="border-3 rounded-lg border-black" />
+            </a>
+
+            <div v-if="gameState === 'panel'" class="grid grid-cols-2 gap-3 p-5 overflow-scroll">
                 <img
                     v-for="panel in panelPieces"
                     :key="panel.url"
@@ -42,7 +46,7 @@ const getPlayerIcon = (peerId: string) => {
                 />
             </div>
 
-            <div v-else-if="gameState === 'doodle'" class="grid grid-cols-3 gap-3 p-5 overflow-scroll h-full">
+            <div v-else-if="gameState === 'doodle'" class="grid grid-cols-3 gap-3 p-5 overflow-scroll">
                 <Button
                     v-for="(button, i) in paletteButtons"
                     :key="i"
@@ -59,7 +63,7 @@ const getPlayerIcon = (peerId: string) => {
                 </Button>
             </div>
 
-            <div v-else-if="gameState === 'present'" class="flex flex-col gap-3 p-5 overflow-scroll h-full">
+            <div v-else-if="gameState === 'present'" class="flex flex-col gap-3 p-5 overflow-scroll">
                 <Button
                     v-for="[sourceId, { senderId }] in submissions.entries()"
                     :active="selectedSubmission === sourceId"
@@ -86,7 +90,7 @@ const getPlayerIcon = (peerId: string) => {
 
         <aside
             class="text-3xl text-center flex flex-col gap-3 m-2 p-2 items-center bg-center bg-no-repeat bg-size-[125%_100%]"
-            :style="{ backgroundImage: `url('${tinBg.right}')` }"
+            :style="{ backgroundImage: `url('${backgrounds.tin_right}')` }"
         >
             <h2 class="text-shadow-lg text-shadow-white mt-5">Room Code:</h2>
             <input

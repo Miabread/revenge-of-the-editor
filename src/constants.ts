@@ -51,7 +51,8 @@ export const playerIcons = [
     { url: './assets/player-icons/icon8.webp' },
 ] as const;
 
-export const tinBg = {
-    left: `${import.meta.env.BASE_URL}assets/tin_left.webp`,
-    right: `${import.meta.env.BASE_URL}assets/tin_right.webp`,
+export const backgrounds = {
+    tin_left: `${import.meta.env.BASE_URL}assets/tin_left.webp`,
+    tin_right: `${import.meta.env.BASE_URL}assets/tin_right.webp`,
+    cover: `${import.meta.env.BASE_URL}assets/cover.webp`,
 };
