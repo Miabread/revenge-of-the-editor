@@ -4,3 +4,25 @@
 @theme {
     --font-bangers: 'Bangers', system-ui;
 }
+
+@layer base {
+    * {
+        @apply scrollbar-thin scrollbar-thumb-slate-400 scrollbar-track-transparent dark:scrollbar-thumb-slate-600;
+    }
+
+    ::-webkit-scrollbar {
+        @apply w-2 h-2;
+    }
+
+    ::-webkit-scrollbar-track {
+        @apply bg-transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        @apply bg-slate-400 dark:bg-slate-600 rounded-full;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        @apply bg-slate-500 dark:bg-slate-500;
+    }
+}
