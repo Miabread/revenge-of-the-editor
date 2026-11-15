@@ -1,3 +1,9 @@
+export const gameStateTitles = {
+    panel: 'Place your panels!',
+    doodle: 'Doodle your edits!',
+    present: "Let't see those comics!",
+} as const;
+
 export const panelPieces = [
     { url: './assets/panel/panel1.png' },
     { url: './assets/panel/panel2.png' },
