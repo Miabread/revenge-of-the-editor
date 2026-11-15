@@ -13,12 +13,18 @@ interface Submission {
 }
 
 const gameState = ref<'panel' | 'doodle' | 'present'>('panel');
+const gameStateTitles = {
+    panel: 'Place your panels!',
+    doodle: 'Doodle your edits!',
+    present: "Let't see those comics!",
+};
 
 const canvas = useCanvas();
 
 const submissions = ref(new Map<string, Submission>());
-const readyStatus = ref(new Map<string, boolean>());
+const readyStatuses = ref(new Map<string, boolean>());
 const userContextId = ref('');
+const selfReady = ref(false);
 
 const createRandomSwap = () => {
     const shuffled = [...submissions.value.keys()];
@@ -47,13 +53,13 @@ const finalReadyIntoContinue = () =>
     roomClient.isHost.value &&
     roomClient.peers.value.length >= 2 &&
     submissions.value.size >= roomClient.peers.value.length &&
-    readyStatus.value.size >= roomClient.peers.value.length;
+    readyStatuses.value.size >= roomClient.peers.value.length;
 
 const roomClient = useRoom<Message>(async (payload) => {
     switch (payload.type) {
         case 'panel_ready': {
             submissions.value.set(payload.senderId, payload);
-            readyStatus.value.set(payload.senderId, true);
+            readyStatuses.value.set(payload.senderId, true);
 
             if (finalReadyIntoContinue()) {
                 await roomClient.send({
@@ -70,7 +76,8 @@ const roomClient = useRoom<Message>(async (payload) => {
             userContextId.value = sourceId;
 
             submissions.value.clear();
-            readyStatus.value.clear();
+            readyStatuses.value.clear();
+            selfReady.value = false;
 
             gameState.value = 'doodle';
 
@@ -81,7 +88,7 @@ const roomClient = useRoom<Message>(async (payload) => {
 
         case 'doodle_ready': {
             submissions.value.set(payload.sourceId, payload);
-            readyStatus.value.set(payload.senderId, true);
+            readyStatuses.value.set(payload.senderId, true);
 
             if (finalReadyIntoContinue()) {
                 await roomClient.send({
@@ -93,7 +100,9 @@ const roomClient = useRoom<Message>(async (payload) => {
 
         case 'doodle_continue': {
             const submission = submissions.value.get(roomClient.clientId);
-            readyStatus.value.clear();
+
+            readyStatuses.value.clear();
+            selfReady.value = false;
 
             gameState.value = 'present';
 
@@ -103,7 +112,7 @@ const roomClient = useRoom<Message>(async (payload) => {
         }
 
         case 'present_ready': {
-            readyStatus.value.set(payload.senderId, true);
+            readyStatuses.value.set(payload.senderId, true);
 
             if (finalReadyIntoContinue()) {
                 await roomClient.send({
@@ -114,8 +123,9 @@ const roomClient = useRoom<Message>(async (payload) => {
         }
 
         case 'present_continue': {
-            readyStatus.value.clear();
+            readyStatuses.value.clear();
             canvas.clear();
+            selfReady.value = false;
 
             gameState.value = 'panel';
 
@@ -127,6 +137,9 @@ const roomClient = useRoom<Message>(async (payload) => {
 const sendReady = async () => {
     const imageDataUrl = canvas.getDataUrl();
     if (!imageDataUrl) return;
+
+    canvas.isDisabled.value = true;
+    selfReady.value = true;
 
     switch (gameState.value) {
         case 'panel': {
@@ -152,18 +165,16 @@ const sendReady = async () => {
         }
     }
 };
+
+const copyLinkToClipboard = () => {
+    navigator.clipboard.writeText(window.location.href);
+};
 </script>
 
 <template>
     <div
-        class="special-background font-bangers h-screen w-screen overflow-hidden grid grid-cols-[1fr_3fr_1fr] grid-rows-[75px_1fr]"
+        class="special-background font-bangers h-screen w-screen overflow-hidden grid grid-cols-[1fr_3fr_1fr] grid-rows-1"
     >
-        <header class="col-span-3 bg-stone-50 border-4 border-black m-2 p-2 flex gap-3">
-            <Button @click="canvas.saveAsImage">Save as Image</Button>
-            <Button @click="sendReady" :disabled="!roomClient.isConnected">Ready Up</Button>
-            <Button disabled>{{ gameState }}</Button>
-        </header>
-
         <aside class="m-2 p-2 overflow-scroll bg-[url('/assets/palette.png')] bg-center bg-no-repeat bg-cover">
             <PanelEditor v-if="gameState === 'panel'" :canvas />
             <DoodleEditor v-else-if="gameState === 'doodle'" :canvas />
@@ -178,9 +189,18 @@ const sendReady = async () => {
             <canvas ref="canvas-element" :width="canvas.width" :height="canvas.height" class="border border-gray-600" />
         </main>
 
-        <aside class="flex flex-col gap-3 bg-stone-50 border-4 border-black m-2 p-2 overflow-scroll items-center">
+        <aside
+            class="text-3xl text-center flex flex-col gap-3 bg-stone-50 border-4 border-black m-2 p-2 overflow-scroll items-center"
+        >
+            <h1 class="text-5xl">{{ gameStateTitles[gameState] }}</h1>
+
+            <Button active v-if="selfReady">Ready!!!! 👍</Button>
+            <Button @click="sendReady" :disabled="!roomClient.isConnected" v-else>Ready Up!</Button>
+            <Button @click="copyLinkToClipboard" class="text-xl">Copy Room Link</Button>
+            <Button @click="canvas.saveAsImage" class="text-xl">Save as Image</Button>
+
             <span v-for="peer in roomClient.peers.value">
-                {{ peer }} <template v-if="readyStatus.has(peer)">👍</template>
+                {{ peer }} <template v-if="readyStatuses.has(peer)">👍</template>
             </span>
         </aside>
     </div>
