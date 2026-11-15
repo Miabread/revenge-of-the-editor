@@ -1,4 +1,4 @@
-import { onMounted, onUnmounted, readonly, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, readonly, ref, watch } from 'vue';
 import { createClient, type RealtimeChannel } from '@supabase/supabase-js';
 import { animals, colors, uniqueNamesGenerator } from 'unique-names-generator';
 
@@ -36,12 +36,7 @@ const client = createClient(
     'sb_publishable_HjJZzhBZ-T3LMg2sfzyFtQ_IwEhIY8W',
 );
 
-export interface BroadcastPayload<T = unknown> {
-    senderId: string;
-    data: T;
-}
-
-export function useRoom<T = unknown>(onMessage?: (payload: BroadcastPayload<T>) => void) {
+export function useRoom<T = unknown>(onMessage?: (payload: T & { senderId: string }) => void) {
     const roomCode = useRoomCode();
 
     const clientId = uniqueNamesGenerator({
@@ -63,6 +58,10 @@ export function useRoom<T = unknown>(onMessage?: (payload: BroadcastPayload<T>) 
         peers.value = [];
     };
 
+    onUnmounted(() => {
+        leaveRoom();
+    });
+
     watch(
         roomCode,
         async (newCode) => {
@@ -72,14 +71,14 @@ export function useRoom<T = unknown>(onMessage?: (payload: BroadcastPayload<T>) 
 
             channel = client.channel(`room:${newCode}`, {
                 config: {
-                    broadcast: { self: false },
+                    broadcast: { self: true },
                     presence: { key: clientId },
                 },
             });
 
             channel
-                .on('broadcast', { event: 'sync' }, ({ payload }) => {
-                    onMessage?.(payload as BroadcastPayload<T>);
+                .on('broadcast', { event: 'meow' }, ({ payload }) => {
+                    onMessage?.(payload);
                 })
                 .on('presence', { event: 'sync' }, () => {
                     if (!channel) return;
@@ -96,17 +95,18 @@ export function useRoom<T = unknown>(onMessage?: (payload: BroadcastPayload<T>) 
         { immediate: true },
     );
 
-    const send = async (data: T) => {
+    const send = async (payload: T) => {
         if (!channel || !isConnected.value) return;
         await channel.send({
             type: 'broadcast',
-            event: 'sync',
-            payload: { senderId: clientId, data },
+            event: 'meow',
+            payload: { ...payload, senderId: clientId },
         });
     };
 
-    onUnmounted(() => {
-        leaveRoom();
+    const isHost = computed(() => {
+        const sorted = [...peers.value].sort();
+        return sorted[0] === clientId;
     });
 
     return {
@@ -114,5 +114,6 @@ export function useRoom<T = unknown>(onMessage?: (payload: BroadcastPayload<T>) 
         isConnected,
         peers,
         send,
+        isHost,
     };
 }
