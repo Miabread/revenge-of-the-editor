@@ -17,6 +17,8 @@ export const useCanvas = () => {
         });
 
         canvas.on('path:created', (e) => e.path.set('erasable', true));
+
+        canvas.requestRenderAll();
     });
     onUnmounted(() => {
         if (!canvas) return;
