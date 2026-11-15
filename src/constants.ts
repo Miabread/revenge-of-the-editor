@@ -1,7 +1,7 @@
 export const gameStateTitles = {
     panel: 'Place your panels!',
     doodle: 'Doodle your edits!',
-    present: "Let't see those comics!",
+    present: "Let's see those comics!",
 } as const;
 
 export const panelPieces = [
