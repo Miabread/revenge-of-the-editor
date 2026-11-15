@@ -39,3 +39,14 @@ export const paletteButtons = [
     { key: 'color', value: 'purple', label: '' },
     { key: 'style', value: 'eraser', label: 'Eraser' },
 ] as const;
+
+export const playerIcons = [
+    { url: './assets/player-icons/icon1.png' },
+    { url: './assets/player-icons/icon2.png' },
+    { url: './assets/player-icons/icon3.png' },
+    { url: './assets/player-icons/icon4.png' },
+    { url: './assets/player-icons/icon5.png' },
+    { url: './assets/player-icons/icon6.png' },
+    { url: './assets/player-icons/icon7.png' },
+    { url: './assets/player-icons/icon8.png' },
+] as const;

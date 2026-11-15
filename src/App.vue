@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Button from './Button.vue';
-import { paletteButtons, panelPieces, gameStateTitles } from './constants.ts';
+import { paletteButtons, panelPieces, gameStateTitles, playerIcons } from './constants.ts';
 import { useGame } from './game.ts';
 
 const {
@@ -14,6 +14,15 @@ const {
     selfReady,
     readyStatuses,
 } = useGame();
+
+const getPlayerIcon = (peerId: string) => {
+    let hash = 2166136261;
+    for (let i = 0; i < peerId.length; i++) {
+        hash ^= peerId.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+    }
+    return playerIcons[(hash >>> 0) % playerIcons.length].url;
+};
 
 const tinLeftBg = `${import.meta.env.BASE_URL}assets/tin_left.png`;
 const tinRightBg = `${import.meta.env.BASE_URL}assets/tin_right.png`;
@@ -68,7 +77,7 @@ const tinRightBg = `${import.meta.env.BASE_URL}assets/tin_right.png`;
         <main
             @dragover.prevent="canvas.onCanvasDragOver"
             @drop.prevent="canvas.onCanvasDrop"
-            class="m-2 p-2 flex items-center justify-center min-h-0 min-w-0 overflow-hidden"
+            class="m-2 p-2 flex items-center justify-center min-h-0 min-w-0 overflow-hidden will-change-transform"
         >
             <canvas
                 ref="canvas-element"
@@ -79,7 +88,7 @@ const tinRightBg = `${import.meta.env.BASE_URL}assets/tin_right.png`;
         </main>
 
         <aside
-            class="text-3xl text-center flex flex-col gap-3 m-2 p-2 overflow-scroll items-center bg-center bg-no-repeat bg-size-[125%_100%]"
+            class="text-3xl text-center flex flex-col gap-3 m-2 p-2 items-center bg-center bg-no-repeat bg-size-[125%_100%]"
             :style="{ backgroundImage: `url('${tinRightBg}')` }"
         >
             <h2 class="text-shadow-lg text-shadow-white mt-5">Room Code:</h2>
@@ -91,12 +100,19 @@ const tinRightBg = `${import.meta.env.BASE_URL}assets/tin_right.png`;
             <h1 class="text-5xl text-shadow-lg text-shadow-white">{{ gameStateTitles[gameState] }}</h1>
 
             <Button active v-if="selfReady">Ready!!!! 👍</Button>
-            <Button @click="sendReady" :disabled="!roomClient.isConnected" v-else>Ready Up!</Button>
+            <Button @click="sendReady" :disabled="!roomClient.isConnected.value" v-else>Ready Up!</Button>
             <Button @click="canvas.saveAsImage" class="text-xl mb-5">Save as Image</Button>
 
-            <span v-for="peer in roomClient.peers.value" class="text-shadow-lg text-shadow-white">
-                {{ peer }} <template v-if="readyStatuses.has(peer)">👍</template>
-            </span>
+            <div class="flex flex-col gap-3 p-5 overflow-scroll h-full">
+                <span
+                    v-for="peerId in roomClient.peers.value"
+                    class="text-shadow-lg text-shadow-white inline-flex items-center gap-1.5"
+                >
+                    <img class="w-15 h-15 shrink-0 object-contain" :src="getPlayerIcon(peerId)" />
+                    <span>{{ peerId }}</span>
+                    <span v-if="readyStatuses.has(peerId)">👍</span>
+                </span>
+            </div>
         </aside>
     </div>
 </template>
@@ -105,15 +121,10 @@ const tinRightBg = `${import.meta.env.BASE_URL}assets/tin_right.png`;
 .special-background {
     background-color: #ffde00;
     background-image:
-        radial-gradient(rgba(0, 0, 0, 0.25) 2px, transparent 0),
-        radial-gradient(rgba(0, 0, 0, 0.25) 2px, transparent 0), linear-gradient(135deg, #ffde00 0%, #ff5e00 100%);
+        url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' xmlns='http://w3.org cx='2' cy='2' r='2' fill='rgba(0,0,0,0.22)'/%3E%3Ccircle cx='10' cy='10' r='2' fill='rgba(0,0,0,0.22)'/%3E%3C/svg%3E"),
+        linear-gradient(135deg, #ffde00 0%, #ff5e00 100%);
     background-size:
         16px 16px,
-        16px 16px,
         100% 100%;
-    background-position:
-        0 0,
-        8px 8px,
-        0 0;
 }
 </style>
