@@ -38,7 +38,7 @@ const getPlayerIcon = (peerId: string) => {
                 <img :src="backgrounds.cover" class="border-3 rounded-lg border-black" />
             </a>
 
-            <div v-if="gameState === 'panel'" class="grid grid-cols-2 gap-3 p-5 overflow-scroll">
+            <div v-if="gameState === 'panel'" class="grid grid-cols-2 gap-3 p-5 overflow-scroll w-full">
                 <img
                     v-for="panel in panelPieces"
                     :key="panel.url"
@@ -49,7 +49,7 @@ const getPlayerIcon = (peerId: string) => {
                 />
             </div>
 
-            <div v-else-if="gameState === 'doodle'" class="grid grid-cols-3 gap-3 p-5 overflow-scroll">
+            <div v-else-if="gameState === 'doodle'" class="grid grid-cols-3 gap-3 p-5 overflow-scroll w-full">
                 <Button
                     v-for="(button, i) in paletteButtons"
                     :key="i"
@@ -66,7 +66,7 @@ const getPlayerIcon = (peerId: string) => {
                 </Button>
             </div>
 
-            <div v-else-if="gameState === 'present'" class="flex flex-col gap-3 p-5 overflow-scroll">
+            <div v-else-if="gameState === 'present'" class="flex flex-col gap-3 p-5 overflow-scroll w-full">
                 <Button
                     v-for="[sourceId, { senderId }] in submissions.entries()"
                     :active="selectedSubmission === sourceId"
