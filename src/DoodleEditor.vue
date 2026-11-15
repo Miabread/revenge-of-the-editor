@@ -30,22 +30,20 @@ const paletteButtons = [
 </script>
 
 <template>
-    <aside class="flex flex-col gap-3 bg-stone-50 border-4 border-black m-2 p-2 overflow-scroll">
-        <div class="grid grid-cols-3 gap-3">
-            <Button
-                v-for="(button, i) in paletteButtons"
-                :key="i"
-                @click="(canvas.brush[button.key] as any) = button.value"
-                :active="canvas.brush[button.key] === button.value"
-                class="aspect-square grid place-items-center"
-            >
-                <div
-                    v-if="button.key === 'color'"
-                    :style="{ backgroundColor: button.value }"
-                    class="aspect-square border w-full"
-                ></div>
-                {{ button.label }}
-            </Button>
-        </div>
-    </aside>
+    <div class="grid grid-cols-3 gap-3">
+        <Button
+            v-for="(button, i) in paletteButtons"
+            :key="i"
+            @click="(canvas.brush[button.key] as any) = button.value"
+            :active="canvas.brush[button.key] === button.value"
+            class="aspect-square grid place-items-center"
+        >
+            <div
+                v-if="button.key === 'color'"
+                :style="{ backgroundColor: button.value }"
+                class="aspect-square border w-full"
+            ></div>
+            {{ button.label }}
+        </Button>
+    </div>
 </template>

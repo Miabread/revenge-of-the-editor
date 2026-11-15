@@ -43,20 +43,17 @@ const sendCanvas = async () => {
             <Button @click="sendCanvas" :disabled="!isConnected">Send Canvas</Button>
         </header>
 
-        <PanelEditor v-if="activeTab === 0" :canvas />
-        <DoodleEditor v-else-if="activeTab === 1" :canvas />
+        <aside class="m-2 p-2 overflow-scroll bg-[url('/assets/palette.png')] bg-center bg-no-repeat bg-size-[300%]">
+            <PanelEditor v-if="activeTab === 0" :canvas />
+            <DoodleEditor v-else-if="activeTab === 1" :canvas />
+        </aside>
 
         <main
             @dragover.prevent="canvas.onCanvasDragOver"
             @drop.prevent="canvas.onCanvasDrop"
             class="bg-stone-50 border-4 border-black m-2 p-2 overflow-scroll grid place-items-center"
         >
-            <canvas
-                ref="canvas-element"
-                :width="canvas.width"
-                :height="canvas.height"
-                class="border border-gray-600"
-            ></canvas>
+            <canvas ref="canvas-element" :width="canvas.width" :height="canvas.height" class="border border-gray-600" />
         </main>
 
         <aside class="flex flex-col gap-3 bg-stone-50 border-4 border-black m-2 p-2 overflow-scroll items-center">
