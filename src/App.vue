@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import PanelEditor from './PanelEditor.vue';
 import DoodleEditor from './DoodleEditor.vue';
 import Button from './Button.vue';
-import { useRoom } from './lib.ts';
+import { useRoom } from './netcode.ts';
 
 const activeTab = ref(0);
 const tabs = ['Panel Phase', 'Doodle Phase'];
