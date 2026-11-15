@@ -5,20 +5,20 @@ export const gameStateTitles = {
 } as const;
 
 export const panelPieces = [
-    { url: './assets/panel/panel1.png' },
-    { url: './assets/panel/panel2.png' },
-    { url: './assets/panel/panel3.png' },
-    { url: './assets/panel/panel4.png' },
-    { url: './assets/panel/cloud1.png' },
-    { url: './assets/panel/cloud2.png' },
-    { url: './assets/panel/sliced.png' },
-    { url: './assets/bubble/bubble1.png' },
-    { url: './assets/bubble/bubble2.png' },
-    { url: './assets/bubble/bubble3.png' },
-    { url: './assets/bubble/bubble4.png' },
-    { url: './assets/bubble/bubble5.png' },
-    { url: './assets/bubble/bubble6.png' },
-    { url: './assets/bubble/bubble7.png' },
+    { url: './assets/panel/panel1.webp' },
+    { url: './assets/panel/panel2.webp' },
+    { url: './assets/panel/panel3.webp' },
+    { url: './assets/panel/panel4.webp' },
+    { url: './assets/panel/cloud1.webp' },
+    { url: './assets/panel/cloud2.webp' },
+    { url: './assets/panel/sliced.webp' },
+    { url: './assets/bubble/bubble1.webp' },
+    { url: './assets/bubble/bubble2.webp' },
+    { url: './assets/bubble/bubble3.webp' },
+    { url: './assets/bubble/bubble4.webp' },
+    { url: './assets/bubble/bubble5.webp' },
+    { url: './assets/bubble/bubble6.webp' },
+    { url: './assets/bubble/bubble7.webp' },
 ] as const;
 
 export const paletteButtons = [
@@ -41,12 +41,17 @@ export const paletteButtons = [
 ] as const;
 
 export const playerIcons = [
-    { url: './assets/player-icons/icon1.png' },
-    { url: './assets/player-icons/icon2.png' },
-    { url: './assets/player-icons/icon3.png' },
-    { url: './assets/player-icons/icon4.png' },
-    { url: './assets/player-icons/icon5.png' },
-    { url: './assets/player-icons/icon6.png' },
-    { url: './assets/player-icons/icon7.png' },
-    { url: './assets/player-icons/icon8.png' },
+    { url: './assets/player-icons/icon1.webp' },
+    { url: './assets/player-icons/icon2.webp' },
+    { url: './assets/player-icons/icon3.webp' },
+    { url: './assets/player-icons/icon4.webp' },
+    { url: './assets/player-icons/icon5.webp' },
+    { url: './assets/player-icons/icon6.webp' },
+    { url: './assets/player-icons/icon7.webp' },
+    { url: './assets/player-icons/icon8.webp' },
 ] as const;
+
+export const tinBg = {
+    left: `${import.meta.env.BASE_URL}assets/tin_left.webp`,
+    right: `${import.meta.env.BASE_URL}assets/tin_right.webp`,
+};

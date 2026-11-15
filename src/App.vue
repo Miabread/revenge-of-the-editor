@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Button from './Button.vue';
-import { paletteButtons, panelPieces, gameStateTitles, playerIcons } from './constants.ts';
+import { paletteButtons, panelPieces, gameStateTitles, playerIcons, tinBg } from './constants.ts';
 import { useGame } from './game.ts';
 
 const {
@@ -23,16 +23,13 @@ const getPlayerIcon = (peerId: string) => {
     }
     return playerIcons[(hash >>> 0) % playerIcons.length].url;
 };
-
-const tinLeftBg = `${import.meta.env.BASE_URL}assets/tin_left.png`;
-const tinRightBg = `${import.meta.env.BASE_URL}assets/tin_right.png`;
 </script>
 
 <template>
     <div class="special-background font-bangers h-dvh w-dvw overflow-hidden grid grid-cols-[1fr_3fr_1fr] grid-rows-1">
         <aside
             class="m-2 p-2 bg-center bg-no-repeat bg-size-[125%_100%]"
-            :style="{ backgroundImage: `url('${tinLeftBg}')` }"
+            :style="{ backgroundImage: `url('${tinBg.left}')` }"
         >
             <div v-if="gameState === 'panel'" class="grid grid-cols-2 gap-3 p-5 overflow-scroll h-full">
                 <img
@@ -89,7 +86,7 @@ const tinRightBg = `${import.meta.env.BASE_URL}assets/tin_right.png`;
 
         <aside
             class="text-3xl text-center flex flex-col gap-3 m-2 p-2 items-center bg-center bg-no-repeat bg-size-[125%_100%]"
-            :style="{ backgroundImage: `url('${tinRightBg}')` }"
+            :style="{ backgroundImage: `url('${tinBg.right}')` }"
         >
             <h2 class="text-shadow-lg text-shadow-white mt-5">Room Code:</h2>
             <input
