@@ -36,7 +36,7 @@ const paletteButtons = [
             :key="i"
             @click="(canvas.brush[button.key] as any) = button.value"
             :active="canvas.brush[button.key] === button.value"
-            class="aspect-square grid place-items-center"
+            class="aspect-square"
         >
             <div
                 v-if="button.key === 'color'"
