@@ -1,5 +1,6 @@
 import { Canvas, FabricImage, getEnv, PatternBrush, PencilBrush } from 'fabric';
 import { onMounted, onUnmounted, reactive, watch, useTemplateRef, ref } from 'vue';
+import { EraserBrush } from '@erase2d/fabric';
 
 export type CanvasProps = ReturnType<typeof useCanvas>;
 
@@ -14,6 +15,8 @@ export const useCanvas = () => {
         canvas = new Canvas(canvasElement.value!, {
             backgroundColor: '#ffffff',
         });
+
+        canvas.on('path:created', (e) => e.path.set('erasable', true));
     });
     onUnmounted(() => {
         if (!canvas) return;
@@ -57,13 +60,20 @@ export const useCanvas = () => {
         enabled: false,
         color: 'black',
         width: 20,
-        style: 'solid' as 'solid' | 'dots' | 'lines',
+        style: 'solid' as 'solid' | 'dots' | 'lines' | 'eraser',
     });
 
     const onBrushUpdate = () => {
         if (!canvas) return;
 
         canvas.isDrawingMode = brush.enabled;
+
+        if (brush.style === 'eraser') {
+            const eraser = new EraserBrush(canvas);
+            eraser.width = brush.width;
+            canvas.freeDrawingBrush = eraser;
+            return;
+        }
 
         if (brush.style === 'solid') {
             canvas.freeDrawingBrush = new PencilBrush(canvas);
@@ -123,6 +133,7 @@ export const useCanvas = () => {
             borderColor: '#2563eb',
             transparentCorners: false,
             snapAngle: 15,
+            erasable: false,
         });
 
         canvas.add(image);

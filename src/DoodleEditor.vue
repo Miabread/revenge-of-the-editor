@@ -30,11 +30,12 @@ const paletteButtons = [
     { key: 'color', value: 'green', label: '' },
     { key: 'color', value: 'blue', label: '' },
     { key: 'color', value: 'purple', label: '' },
+    { key: 'style', value: 'eraser', label: 'Eraser' },
 ] as const;
 </script>
 
 <template>
-    <div class="grid grid-cols-3 gap-3">
+    <div class="grid grid-cols-3 gap-3 p-5 overflow-scroll h-full">
         <Button
             v-for="(button, i) in paletteButtons"
             :key="i"
