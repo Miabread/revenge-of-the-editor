@@ -2,6 +2,9 @@
 import Button from './Button.vue';
 import { paletteButtons, panelPieces, gameStateTitles, playerIcons, backgrounds } from './constants.ts';
 import { useGame } from './game.ts';
+import { useMusic } from './music.ts';
+
+useMusic();
 
 const {
     canvas,

@@ -56,3 +56,5 @@ export const backgrounds = {
     tin_right: `${import.meta.env.BASE_URL}assets/tin_right.webp`,
     cover: `${import.meta.env.BASE_URL}assets/cover.webp`,
 };
+
+export const music = `${import.meta.env.BASE_URL}assets/bgm.mp3`;
