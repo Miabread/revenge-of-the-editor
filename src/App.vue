@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import PanelEditor from './PanelEditor.vue';
-import DoodleEditor from './DoodleEditor.vue';
 import Button from './Button.vue';
 import { useRoom } from './netcode.ts';
 import { useCanvas } from './canvas.ts';
-import PresentEditor from './PresentEditor.vue';
+import { paletteButtons, panelPieces } from './constants.ts';
 
 const canvas = useCanvas();
 
@@ -25,6 +23,7 @@ const submissions = ref(new Map<string, Submission>());
 const readyStatuses = ref(new Map<string, boolean>());
 const userContextId = ref('');
 const selfReady = ref(false);
+const submissionSelected = ref('');
 
 watch(
     gameState,
@@ -117,6 +116,7 @@ const roomClient = useRoom<Message>(async (payload) => {
 
         case 'doodle_continue': {
             const submission = submissions.value.get(roomClient.clientId);
+            submissionSelected.value = roomClient.clientId;
 
             readyStatuses.value.clear();
             selfReady.value = false;
@@ -183,6 +183,13 @@ const sendReady = async () => {
     }
 };
 
+const selectSubmission = (sourceId: string) => {
+    submissionSelected.value = sourceId;
+    const submission = submissions.value.get(sourceId);
+    if (!submission) return;
+    canvas.setDataUrl(submission.imageDataUrl);
+};
+
 const tinLeftBg = `${import.meta.env.BASE_URL}assets/tin_left.png`;
 const tinRightBg = `${import.meta.env.BASE_URL}assets/tin_right.png`;
 </script>
@@ -193,9 +200,44 @@ const tinRightBg = `${import.meta.env.BASE_URL}assets/tin_right.png`;
             class="m-2 p-2 bg-center bg-no-repeat bg-size-[125%_100%]"
             :style="{ backgroundImage: `url('${tinLeftBg}')` }"
         >
-            <PanelEditor v-if="gameState === 'panel'" :canvas />
-            <DoodleEditor v-else-if="gameState === 'doodle'" :canvas />
-            <PresentEditor v-else-if="gameState === 'present'" :canvas />
+            <div v-if="gameState === 'panel'" class="grid grid-cols-2 gap-3 p-5 overflow-scroll h-full">
+                <img
+                    v-for="panel in panelPieces"
+                    :key="panel.url"
+                    draggable="true"
+                    @dragstart="canvas.onPanelDragStart($event, panel.url)"
+                    :src="panel.url"
+                    class="width-full cursor-grab"
+                />
+            </div>
+
+            <div v-else-if="gameState === 'doodle'" class="grid grid-cols-3 gap-3 p-5 overflow-scroll h-full">
+                <Button
+                    v-for="(button, i) in paletteButtons"
+                    :key="i"
+                    @click="(canvas.brush[button.key] as any) = button.value"
+                    :active="canvas.brush[button.key] === button.value"
+                    class="aspect-square"
+                >
+                    <div
+                        v-if="button.key === 'color'"
+                        :style="{ backgroundColor: button.value }"
+                        class="aspect-square border w-full"
+                    ></div>
+                    {{ button.label }}
+                </Button>
+            </div>
+
+            <div v-else-if="gameState === 'present'" class="flex flex-col gap-3 p-5 overflow-scroll h-full">
+                <Button
+                    v-for="[sourceId, { senderId }] in submissions.entries()"
+                    :active="submissionSelected === sourceId"
+                    @click="selectSubmission(sourceId)"
+                >
+                    🖼️ {{ sourceId }} <br />
+                    🖌️{{ senderId }}
+                </Button>
+            </div>
         </aside>
 
         <main
@@ -218,7 +260,7 @@ const tinRightBg = `${import.meta.env.BASE_URL}assets/tin_right.png`;
             <h2 class="text-shadow-lg text-shadow-white mt-5">Room Code:</h2>
             <input
                 v-model="roomClient.roomCode.value"
-                class="border border-gray-600 px-4 bg-stone-50 grid place-items-center text-center w-1/2 mb-5"
+                class="w-1/2 mb-5 border-4 border-black bg-stone-50 px-4 py-1.5 text-center font-extrabold uppercase tracking-widest text-black placeholder:text-stone-400 shadow-[4px_4px_0px_#000] focus:outline-none focus:bg-yellow-200 focus:-translate-x-px focus:-translate-y-px focus:shadow-[5px_5px_0px_#000]"
             />
 
             <h1 class="text-5xl text-shadow-lg text-shadow-white">{{ gameStateTitles[gameState] }}</h1>

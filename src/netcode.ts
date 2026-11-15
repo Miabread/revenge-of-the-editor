@@ -2,10 +2,10 @@ import { computed, customRef, onUnmounted, ref, watch } from 'vue';
 import { createClient, type RealtimeChannel } from '@supabase/supabase-js';
 import { animals, colors, uniqueNamesGenerator } from 'unique-names-generator';
 
-const generateHexCode = () =>
-    Math.floor(Math.random() * 0x1000000)
+const generateHexCode = (digits = 4) =>
+    Math.floor(Math.random() * 16 ** digits)
         .toString(16)
-        .padStart(6, '0')
+        .padStart(digits, '0')
         .toUpperCase();
 
 const useDebouncedRef = <T>(value: T, delay = 300) => {
