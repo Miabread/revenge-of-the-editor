@@ -5,8 +5,8 @@ import { EraserBrush } from '@erase2d/fabric';
 export type CanvasProps = ReturnType<typeof useCanvas>;
 
 export const useCanvas = () => {
-    const height = 500;
-    const width = Math.floor(height * (16 / 9));
+    const height = 800;
+    const width = 800;
 
     const canvasElement = useTemplateRef<HTMLCanvasElement>('canvas-element');
 

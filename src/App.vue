@@ -166,18 +166,12 @@ const sendReady = async () => {
     }
 };
 
-const copyLinkToClipboard = () => {
-    navigator.clipboard.writeText(window.location.href);
-};
-
 const tinLeftBg = `${import.meta.env.BASE_URL}assets/tin_left.png`;
 const tinRightBg = `${import.meta.env.BASE_URL}assets/tin_right.png`;
 </script>
 
 <template>
-    <div
-        class="special-background font-bangers h-screen w-screen overflow-hidden grid grid-cols-[1fr_3fr_1fr] grid-rows-1"
-    >
+    <div class="special-background font-bangers h-dvh w-dvw overflow-hidden grid grid-cols-[1fr_3fr_1fr] grid-rows-1">
         <aside
             class="m-2 p-2 bg-center bg-no-repeat bg-size-[125%_100%]"
             :style="{ backgroundImage: `url('${tinLeftBg}')` }"
@@ -190,13 +184,13 @@ const tinRightBg = `${import.meta.env.BASE_URL}assets/tin_right.png`;
         <main
             @dragover.prevent="canvas.onCanvasDragOver"
             @drop.prevent="canvas.onCanvasDrop"
-            class="bg-stone-50 border-5 rounded-xl border-black m-2 p-2 grid place-items-center"
+            class="m-2 p-2 flex items-center justify-center min-h-0 min-w-0 overflow-hidden"
         >
             <canvas
                 ref="canvas-element"
                 :width="canvas.width"
                 :height="canvas.height"
-                class="border border-gray-600 w-full h-full object-contain"
+                class="border-5 rounded-xl border-black"
             />
         </main>
 
@@ -204,12 +198,17 @@ const tinRightBg = `${import.meta.env.BASE_URL}assets/tin_right.png`;
             class="text-3xl text-center flex flex-col gap-3 m-2 p-2 overflow-scroll items-center bg-center bg-no-repeat bg-size-[125%_100%]"
             :style="{ backgroundImage: `url('${tinRightBg}')` }"
         >
+            <h2 class="text-shadow-lg text-shadow-white mt-5">Room Code:</h2>
+            <input
+                v-model="roomClient.roomCode.value"
+                class="border border-gray-600 px-4 bg-stone-50 grid place-items-center text-center w-1/2 mb-5"
+            />
+
             <h1 class="text-5xl text-shadow-lg text-shadow-white">{{ gameStateTitles[gameState] }}</h1>
 
             <Button active v-if="selfReady">Ready!!!! 👍</Button>
             <Button @click="sendReady" :disabled="!roomClient.isConnected" v-else>Ready Up!</Button>
-            <Button @click="copyLinkToClipboard" class="text-xl">Copy Room Link</Button>
-            <Button @click="canvas.saveAsImage" class="text-xl">Save as Image</Button>
+            <Button @click="canvas.saveAsImage" class="text-xl mb-5">Save as Image</Button>
 
             <span v-for="peer in roomClient.peers.value" class="text-shadow-lg text-shadow-white">
                 {{ peer }} <template v-if="readyStatuses.has(peer)">👍</template>

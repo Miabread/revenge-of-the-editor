@@ -1,34 +1,40 @@
-import { computed, onMounted, onUnmounted, readonly, ref, watch } from 'vue';
+import { computed, customRef, onUnmounted, ref, watch } from 'vue';
 import { createClient, type RealtimeChannel } from '@supabase/supabase-js';
 import { animals, colors, uniqueNamesGenerator } from 'unique-names-generator';
 
+const generateHexCode = () =>
+    Math.floor(Math.random() * 0x1000000)
+        .toString(16)
+        .padStart(6, '0')
+        .toUpperCase();
+
+const useDebouncedRef = <T>(value: T, delay = 300) => {
+    let timeout: number | undefined;
+    return customRef<T>((track, trigger) => ({
+        get() {
+            track();
+            return value;
+        },
+        set(newValue: T) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                value = newValue;
+                trigger();
+            }, delay);
+        },
+    }));
+};
+
 export const useRoomCode = () => {
-    const roomCode = ref('');
+    const roomCode = useDebouncedRef<string>(generateHexCode());
 
-    const updateRoomCode = () => {
-        const hash = window.location.hash.slice(1).trim().toUpperCase();
-        if (hash) {
-            roomCode.value = hash;
-            return;
+    watch(roomCode, (newVal) => {
+        if (newVal.trim().length === 0) {
+            roomCode.value = generateHexCode();
         }
-
-        const hex = Math.floor(Math.random() * 0x1000000).toString(16);
-        const code = hex.padStart(6, '0').toUpperCase();
-
-        roomCode.value = code;
-        window.history.replaceState(null, '', `#${code}`);
-    };
-
-    onMounted(() => {
-        updateRoomCode();
-        window.addEventListener('hashchange', updateRoomCode);
     });
 
-    onUnmounted(() => {
-        window.removeEventListener('hashchange', updateRoomCode);
-    });
-
-    return readonly(roomCode);
+    return roomCode;
 };
 
 const client = createClient(
@@ -115,5 +121,6 @@ export function useRoom<T = unknown>(onMessage?: (payload: T & { senderId: strin
         peers,
         send,
         isHost,
+        roomCode,
     };
 }
