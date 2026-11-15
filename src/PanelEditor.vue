@@ -12,9 +12,9 @@ canvas.brush.enabled = false;
 
 const panelPieces = ref([
     { url: '/assets/panel/panel1.png' },
+    { url: '/assets/panel/panel2.png' },
     { url: '/assets/panel/panel3.png' },
     { url: '/assets/panel/panel4.png' },
-    { url: '/assets/panel/panel5.png' },
     { url: '/assets/bubble/bubble1.png' },
     { url: '/assets/bubble/bubble3.png' },
     { url: '/assets/bubble/bubble4.png' },

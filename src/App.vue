@@ -43,7 +43,7 @@ const sendCanvas = async () => {
             <Button @click="sendCanvas" :disabled="!isConnected">Send Canvas</Button>
         </header>
 
-        <aside class="m-2 p-2 overflow-scroll bg-[url('/assets/palette.png')] bg-center bg-no-repeat bg-size-[300%]">
+        <aside class="m-2 p-2 overflow-scroll bg-[url('/assets/palette.png')] bg-center bg-no-repeat bg-cover">
             <PanelEditor v-if="activeTab === 0" :canvas />
             <DoodleEditor v-else-if="activeTab === 1" :canvas />
         </aside>
