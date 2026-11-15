@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import Button from './Button.vue';
 import type { CanvasProps } from './canvas.ts';
 
 interface Props {
@@ -25,7 +24,6 @@ const panelPieces = ref([
 
 <template>
     <aside id="panel-palette" class="flex flex-col gap-3 bg-stone-50 border-4 border-black m-2 p-2 overflow-scroll">
-        <Button @click="canvas.saveAsImage">Save as Image</Button>
         <div class="grid grid-cols-2 gap-3">
             <img
                 v-for="panel in panelPieces"

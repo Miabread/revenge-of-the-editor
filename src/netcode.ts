@@ -36,10 +36,15 @@ const client = createClient(
     'sb_publishable_HjJZzhBZ-T3LMg2sfzyFtQ_IwEhIY8W',
 );
 
-export function useRoom() {
+export interface BroadcastPayload<T = unknown> {
+    senderId: string;
+    data: T;
+}
+
+export function useRoom<T = unknown>(onMessage?: (payload: BroadcastPayload<T>) => void) {
     const roomCode = useRoomCode();
 
-    const username = uniqueNamesGenerator({
+    const clientId = uniqueNamesGenerator({
         dictionaries: [colors, animals],
         separator: ' ',
         style: 'capital',
@@ -68,11 +73,14 @@ export function useRoom() {
             channel = client.channel(`room:${newCode}`, {
                 config: {
                     broadcast: { self: false },
-                    presence: { key: username },
+                    presence: { key: clientId },
                 },
             });
 
             channel
+                .on('broadcast', { event: 'sync' }, ({ payload }) => {
+                    onMessage?.(payload as BroadcastPayload<T>);
+                })
                 .on('presence', { event: 'sync' }, () => {
                     if (!channel) return;
                     const state = channel.presenceState();
@@ -88,13 +96,23 @@ export function useRoom() {
         { immediate: true },
     );
 
+    const send = async (data: T) => {
+        if (!channel || !isConnected.value) return;
+        await channel.send({
+            type: 'broadcast',
+            event: 'sync',
+            payload: { senderId: clientId, data },
+        });
+    };
+
     onUnmounted(() => {
         leaveRoom();
     });
 
     return {
-        clientId: username,
+        clientId,
         isConnected,
         peers,
+        send,
     };
 }

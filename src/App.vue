@@ -9,9 +9,28 @@ import { useCanvas } from './canvas.ts';
 const activeTab = ref(0);
 const tabs = ['Panel Phase', 'Doodle Phase'];
 
-const { peers, isConnected } = useRoom();
-
 const canvas = useCanvas();
+
+interface CanvasSwapPayload {
+    type: 'SWAP_CANVAS';
+    imageDataUrl: string;
+}
+
+const { isConnected, peers, send } = useRoom<CanvasSwapPayload>(async ({ data }) => {
+    if (data.type === 'SWAP_CANVAS') {
+        await canvas.setDataUrl(data.imageDataUrl);
+    }
+});
+
+const sendCanvas = async () => {
+    const imageDataUrl = canvas.getDataUrl();
+    if (!imageDataUrl) return;
+
+    await send({
+        type: 'SWAP_CANVAS',
+        imageDataUrl,
+    });
+};
 </script>
 
 <template>
@@ -20,7 +39,8 @@ const canvas = useCanvas();
             <Button v-for="(tab, index) in tabs" :key="tab" :active="activeTab === index" @click="activeTab = index">
                 {{ tab }}
             </Button>
-            isConnected {{ isConnected }}
+            <Button @click="canvas.saveAsImage">Save as Image</Button>
+            <Button @click="sendCanvas" :disabled="!isConnected">Send Canvas</Button>
         </header>
 
         <PanelEditor v-if="activeTab === 0" :canvas />

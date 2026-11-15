@@ -142,11 +142,45 @@ export const useCanvas = () => {
     onMounted(() => window.addEventListener('keydown', onGlobalKeyDown));
     onUnmounted(() => window.removeEventListener('keydown', onGlobalKeyDown));
 
+    const setDataUrl = async (dataUrl: string) => {
+        if (!canvas) return;
+
+        canvas.clear();
+
+        const image = await FabricImage.fromURL(dataUrl);
+
+        image.set({
+            originX: 'center',
+            originY: 'center',
+            left: width / 2,
+            top: height / 2,
+        });
+
+        image.scale(Math.min(canvas.width / image.width, canvas.height / image.height));
+
+        canvas.backgroundImage = image;
+        canvas.requestRenderAll();
+    };
+
+    const getDataUrl = () => {
+        if (!canvas) return;
+
+        return canvas.toDataURL({
+            format: 'webp',
+            quality: 1,
+            multiplier: 1,
+        });
+    };
+
     return {
         width,
         height,
         brush,
         saveAsImage,
+
+        setDataUrl,
+        getDataUrl,
+
         onCanvasDragOver,
         onCanvasDrop,
         onPanelDragStart,

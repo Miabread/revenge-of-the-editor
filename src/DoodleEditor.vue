@@ -31,7 +31,6 @@ const paletteButtons = [
 
 <template>
     <aside class="flex flex-col gap-3 bg-stone-50 border-4 border-black m-2 p-2 overflow-scroll">
-        <Button @click="canvas.saveAsImage">Save as Image</Button>
         <div class="grid grid-cols-3 gap-3">
             <Button
                 v-for="(button, i) in paletteButtons"
