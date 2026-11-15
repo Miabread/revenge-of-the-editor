@@ -175,7 +175,7 @@ const copyLinkToClipboard = () => {
     <div
         class="special-background font-bangers h-screen w-screen overflow-hidden grid grid-cols-[1fr_3fr_1fr] grid-rows-1"
     >
-        <aside class="m-2 p-2 overflow-scroll bg-[url('/assets/palette.png')] bg-center bg-no-repeat bg-cover">
+        <aside class="m-2 p-2 bg-[url('/assets/tin_left.png')] bg-center bg-no-repeat bg-size-[125%_100%]">
             <PanelEditor v-if="gameState === 'panel'" :canvas />
             <DoodleEditor v-else-if="gameState === 'doodle'" :canvas />
             <PresentEditor v-else-if="gameState === 'present'" :canvas />
@@ -184,22 +184,27 @@ const copyLinkToClipboard = () => {
         <main
             @dragover.prevent="canvas.onCanvasDragOver"
             @drop.prevent="canvas.onCanvasDrop"
-            class="bg-stone-50 border-4 border-black m-2 p-2 overflow-scroll grid place-items-center"
+            class="bg-stone-50 border-5 rounded-xl border-black m-2 p-2 grid place-items-center"
         >
-            <canvas ref="canvas-element" :width="canvas.width" :height="canvas.height" class="border border-gray-600" />
+            <canvas
+                ref="canvas-element"
+                :width="canvas.width"
+                :height="canvas.height"
+                class="border border-gray-600 w-full h-full object-contain"
+            />
         </main>
 
         <aside
-            class="text-3xl text-center flex flex-col gap-3 bg-stone-50 border-4 border-black m-2 p-2 overflow-scroll items-center"
+            class="text-3xl text-center flex flex-col gap-3 m-2 p-2 overflow-scroll items-center bg-[url('/assets/tin_right.png')] bg-center bg-no-repeat bg-size-[125%_100%]"
         >
-            <h1 class="text-5xl">{{ gameStateTitles[gameState] }}</h1>
+            <h1 class="text-5xl text-shadow-lg text-shadow-white">{{ gameStateTitles[gameState] }}</h1>
 
             <Button active v-if="selfReady">Ready!!!! 👍</Button>
             <Button @click="sendReady" :disabled="!roomClient.isConnected" v-else>Ready Up!</Button>
             <Button @click="copyLinkToClipboard" class="text-xl">Copy Room Link</Button>
             <Button @click="canvas.saveAsImage" class="text-xl">Save as Image</Button>
 
-            <span v-for="peer in roomClient.peers.value">
+            <span v-for="peer in roomClient.peers.value" class="text-shadow-lg text-shadow-white">
                 {{ peer }} <template v-if="readyStatuses.has(peer)">👍</template>
             </span>
         </aside>

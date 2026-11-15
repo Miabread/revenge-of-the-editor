@@ -21,6 +21,26 @@ export const useCanvas = () => {
         canvas = null;
     });
 
+    const isDisabled = ref(false);
+
+    const setDisabled = () => {
+        if (!canvas) return;
+
+        canvas.selection = !isDisabled.value;
+
+        if (isDisabled.value) {
+            canvas.discardActiveObject();
+        }
+
+        canvas.forEachObject((obj) => {
+            obj.selectable = !isDisabled.value;
+            obj.evented = !isDisabled.value;
+        });
+
+        canvas.requestRenderAll();
+    };
+    watch(isDisabled, setDisabled);
+
     const saveAsImage = () => {
         if (!canvas) return;
 
@@ -111,7 +131,7 @@ export const useCanvas = () => {
     };
 
     const onPanelDragStart = (e: DragEvent, panelUrl: string) => {
-        if (!e.dataTransfer) return;
+        if (!e.dataTransfer || isDisabled.value) return;
         e.dataTransfer.setData('text/plain', panelUrl);
         e.dataTransfer.effectAllowed = 'copy';
     };
@@ -122,14 +142,14 @@ export const useCanvas = () => {
 
     const onCanvasDrop = async (e: DragEvent) => {
         const imageUrl = e.dataTransfer?.getData('text/plain');
-        if (!imageUrl || !canvas) return;
+        if (!imageUrl || !canvas || isDisabled.value) return;
 
         const pointer = canvas.getScenePoint(e);
         await spawnPanelPiece(imageUrl, pointer);
     };
 
     const onGlobalKeyDown = (e: KeyboardEvent) => {
-        if (!canvas) return;
+        if (!canvas || isDisabled.value) return;
         if (e.key === 'Delete' || e.key === 'Backspace') {
             const active = canvas.getActiveObject();
             if (active) {
@@ -178,26 +198,6 @@ export const useCanvas = () => {
         canvas.backgroundColor = '#ffffff';
         canvas.requestRenderAll();
     };
-
-    const isDisabled = ref(false);
-
-    const setDisabled = () => {
-        if (!canvas) return;
-
-        canvas.selection = !isDisabled.value;
-
-        if (isDisabled.value) {
-            canvas.discardActiveObject();
-        }
-
-        canvas.forEachObject((obj) => {
-            obj.selectable = !isDisabled.value;
-            obj.evented = !isDisabled.value;
-        });
-
-        canvas.requestRenderAll();
-    };
-    watch(isDisabled, setDisabled);
 
     return {
         width,
