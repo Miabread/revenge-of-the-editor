@@ -1,5 +1,5 @@
 import { Canvas, FabricImage, getEnv, PatternBrush, PencilBrush } from 'fabric';
-import { onMounted, onUnmounted, reactive, watch, useTemplateRef } from 'vue';
+import { onMounted, onUnmounted, reactive, watch, useTemplateRef, ref } from 'vue';
 
 export type CanvasProps = ReturnType<typeof useCanvas>;
 
@@ -172,11 +172,42 @@ export const useCanvas = () => {
         });
     };
 
+    const clear = () => {
+        if (!canvas) return;
+        canvas.clear();
+        canvas.backgroundColor = '#ffffff';
+        canvas.requestRenderAll();
+    };
+
+    const isDisabled = ref(false);
+
+    const setDisabled = () => {
+        if (!canvas) return;
+
+        canvas.selection = !isDisabled.value;
+
+        if (isDisabled.value) {
+            canvas.discardActiveObject();
+        }
+
+        canvas.forEachObject((obj) => {
+            obj.selectable = !isDisabled.value;
+            obj.evented = !isDisabled.value;
+        });
+
+        canvas.requestRenderAll();
+    };
+    watch(isDisabled, setDisabled);
+
     return {
         width,
         height,
+
         brush,
+        isDisabled,
+
         saveAsImage,
+        clear,
 
         setDataUrl,
         getDataUrl,

@@ -5,22 +5,22 @@ import DoodleEditor from './DoodleEditor.vue';
 import Button from './Button.vue';
 import { useRoom } from './netcode.ts';
 import { useCanvas } from './canvas.ts';
+import PresentEditor from './PresentEditor.vue';
 
 interface Submission {
     senderId: string;
     imageDataUrl: string;
 }
 
-const activeTab = ref(0);
-const tabs = ['Panel Phase', 'Doodle Phase'];
+const gameState = ref<'panel' | 'doodle' | 'present'>('panel');
 
 const canvas = useCanvas();
 
-const submissions = ref<Map<string, Submission>>(new Map());
+const submissions = ref(new Map<string, Submission>());
+const readyStatus = ref(new Map<string, boolean>());
+const userContextId = ref('');
 
 const createRandomSwap = () => {
-    if (submissions.value.size < 2) return;
-
     const shuffled = [...submissions.value.keys()];
     for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -38,51 +38,119 @@ const createRandomSwap = () => {
 };
 
 type Message =
-    | {
-          type: 'SUBMIT_IMAGE';
-          imageDataUrl: string;
-      }
-    | {
-          type: 'SWAP_COMPLETE';
-          assignments: Record<string, string>;
-      };
+    | { type: 'panel_ready'; imageDataUrl: string }
+    | { type: 'doodle_ready'; imageDataUrl: string; sourceId: string }
+    | { type: 'panel_continue'; assignments: Record<string, string> }
+    | { type: 'doodle_continue' | 'present_ready' | 'present_continue' };
+
+const finalReadyIntoContinue = () =>
+    roomClient.isHost.value &&
+    roomClient.peers.value.length >= 2 &&
+    submissions.value.size >= roomClient.peers.value.length &&
+    readyStatus.value.size >= roomClient.peers.value.length;
 
 const roomClient = useRoom<Message>(async (payload) => {
-    if (payload.type === 'SUBMIT_IMAGE') {
-        submissions.value.set(payload.senderId, payload);
-    }
+    switch (payload.type) {
+        case 'panel_ready': {
+            submissions.value.set(payload.senderId, payload);
+            readyStatus.value.set(payload.senderId, true);
 
-    if (
-        payload.type === 'SUBMIT_IMAGE' &&
-        roomClient.isHost.value &&
-        roomClient.peers.value.length >= 2 &&
-        submissions.value.size >= roomClient.peers.value.length
-    ) {
-        const assignments = createRandomSwap();
-        if (!assignments) return;
-        await roomClient.send({
-            type: 'SWAP_COMPLETE',
-            assignments,
-        });
-    }
+            if (finalReadyIntoContinue()) {
+                await roomClient.send({
+                    type: 'panel_continue',
+                    assignments: createRandomSwap(),
+                });
+            }
+            break;
+        }
 
-    if (payload.type === 'SWAP_COMPLETE') {
-        const submission = submissions.value.get(payload.assignments[roomClient.clientId]);
-        submissions.value.clear();
-        if (!submission) return;
+        case 'panel_continue': {
+            const sourceId = payload.assignments[roomClient.clientId];
+            const submission = submissions.value.get(sourceId);
+            userContextId.value = sourceId;
 
-        canvas.setDataUrl(submission.imageDataUrl);
+            submissions.value.clear();
+            readyStatus.value.clear();
+
+            gameState.value = 'doodle';
+
+            if (!submission) return;
+            canvas.setDataUrl(submission.imageDataUrl);
+            break;
+        }
+
+        case 'doodle_ready': {
+            submissions.value.set(payload.sourceId, payload);
+            readyStatus.value.set(payload.senderId, true);
+
+            if (finalReadyIntoContinue()) {
+                await roomClient.send({
+                    type: 'doodle_continue',
+                });
+            }
+            break;
+        }
+
+        case 'doodle_continue': {
+            const submission = submissions.value.get(roomClient.clientId);
+            readyStatus.value.clear();
+
+            gameState.value = 'present';
+
+            if (!submission) return;
+            canvas.setDataUrl(submission.imageDataUrl);
+            break;
+        }
+
+        case 'present_ready': {
+            readyStatus.value.set(payload.senderId, true);
+
+            if (finalReadyIntoContinue()) {
+                await roomClient.send({
+                    type: 'present_continue',
+                });
+            }
+            break;
+        }
+
+        case 'present_continue': {
+            readyStatus.value.clear();
+            canvas.clear();
+
+            gameState.value = 'panel';
+
+            break;
+        }
     }
 });
 
-const sendCanvas = async () => {
+const sendReady = async () => {
     const imageDataUrl = canvas.getDataUrl();
     if (!imageDataUrl) return;
 
-    await roomClient.send({
-        type: 'SUBMIT_IMAGE',
-        imageDataUrl,
-    });
+    switch (gameState.value) {
+        case 'panel': {
+            await roomClient.send({
+                type: `panel_ready`,
+                imageDataUrl,
+            });
+            break;
+        }
+        case 'doodle': {
+            await roomClient.send({
+                type: `doodle_ready`,
+                imageDataUrl,
+                sourceId: userContextId.value,
+            });
+            break;
+        }
+        case 'present': {
+            await roomClient.send({
+                type: `present_ready`,
+            });
+            break;
+        }
+    }
 };
 </script>
 
@@ -91,16 +159,15 @@ const sendCanvas = async () => {
         class="special-background font-bangers h-screen w-screen overflow-hidden grid grid-cols-[1fr_3fr_1fr] grid-rows-[75px_1fr]"
     >
         <header class="col-span-3 bg-stone-50 border-4 border-black m-2 p-2 flex gap-3">
-            <Button v-for="(tab, index) in tabs" :key="tab" :active="activeTab === index" @click="activeTab = index">
-                {{ tab }}
-            </Button>
             <Button @click="canvas.saveAsImage">Save as Image</Button>
-            <Button @click="sendCanvas" :disabled="!roomClient.isConnected">Send Canvas</Button>
+            <Button @click="sendReady" :disabled="!roomClient.isConnected">Ready Up</Button>
+            <Button disabled>{{ gameState }}</Button>
         </header>
 
         <aside class="m-2 p-2 overflow-scroll bg-[url('/assets/palette.png')] bg-center bg-no-repeat bg-cover">
-            <PanelEditor v-if="activeTab === 0" :canvas />
-            <DoodleEditor v-else-if="activeTab === 1" :canvas />
+            <PanelEditor v-if="gameState === 'panel'" :canvas />
+            <DoodleEditor v-else-if="gameState === 'doodle'" :canvas />
+            <PresentEditor v-else-if="gameState === 'present'" :canvas />
         </aside>
 
         <main
@@ -113,7 +180,7 @@ const sendCanvas = async () => {
 
         <aside class="flex flex-col gap-3 bg-stone-50 border-4 border-black m-2 p-2 overflow-scroll items-center">
             <span v-for="peer in roomClient.peers.value">
-                {{ peer }} <template v-if="submissions.has(peer)">👍</template>
+                {{ peer }} <template v-if="readyStatus.has(peer)">👍</template>
             </span>
         </aside>
     </div>
