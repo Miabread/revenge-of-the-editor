@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import type { CanvasProps } from './canvas.ts';
 
 interface Props {
@@ -7,11 +7,6 @@ interface Props {
 }
 
 const { canvas } = defineProps<Props>();
-
-onMounted(() => {
-    canvas.brush.enabled = false;
-    canvas.isDisabled.value = false;
-});
 
 const panelPieces = ref([
     { url: './assets/panel/panel1.png' },

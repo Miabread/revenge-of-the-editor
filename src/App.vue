@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import PanelEditor from './PanelEditor.vue';
 import DoodleEditor from './DoodleEditor.vue';
 import Button from './Button.vue';
@@ -7,10 +7,7 @@ import { useRoom } from './netcode.ts';
 import { useCanvas } from './canvas.ts';
 import PresentEditor from './PresentEditor.vue';
 
-interface Submission {
-    senderId: string;
-    imageDataUrl: string;
-}
+const canvas = useCanvas();
 
 const gameState = ref<'panel' | 'doodle' | 'present'>('panel');
 const gameStateTitles = {
@@ -19,12 +16,32 @@ const gameStateTitles = {
     present: "Let't see those comics!",
 };
 
-const canvas = useCanvas();
+interface Submission {
+    senderId: string;
+    imageDataUrl: string;
+}
 
 const submissions = ref(new Map<string, Submission>());
 const readyStatuses = ref(new Map<string, boolean>());
 const userContextId = ref('');
 const selfReady = ref(false);
+
+watch(
+    gameState,
+    () => {
+        if (gameState.value === 'panel') {
+            canvas.brush.enabled = false;
+            canvas.isDisabled.value = false;
+        } else if (gameState.value === 'doodle') {
+            canvas.brush.enabled = true;
+            canvas.isDisabled.value = false;
+        } else if (gameState.value === 'present') {
+            canvas.brush.enabled = false;
+            canvas.isDisabled.value = true;
+        }
+    },
+    { immediate: true },
+);
 
 const createRandomSwap = () => {
     const shuffled = [...submissions.value.keys()];

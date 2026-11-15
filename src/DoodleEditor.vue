@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
 import Button from './Button.vue';
 import type { CanvasProps } from './canvas.ts';
 
@@ -8,11 +7,6 @@ interface Props {
 }
 
 const { canvas } = defineProps<Props>();
-
-onMounted(() => {
-    canvas.brush.enabled = true;
-    canvas.isDisabled.value = false;
-});
 
 const paletteButtons = [
     { key: 'width', value: 5, label: 'Small' },

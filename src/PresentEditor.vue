@@ -7,11 +7,6 @@ interface Props {
 }
 
 const { canvas } = defineProps<Props>();
-
-onMounted(() => {
-    canvas.brush.enabled = false;
-    canvas.isDisabled.value = true;
-});
 </script>
 
 <template>
