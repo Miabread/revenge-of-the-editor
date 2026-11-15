@@ -4,11 +4,14 @@ import PanelEditor from './PanelEditor.vue';
 import DoodleEditor from './DoodleEditor.vue';
 import Button from './Button.vue';
 import { useRoom } from './netcode.ts';
+import { useCanvas } from './canvas.ts';
 
 const activeTab = ref(0);
 const tabs = ['Panel Phase', 'Doodle Phase'];
 
 const { peers, isConnected } = useRoom();
+
+const canvas = useCanvas();
 </script>
 
 <template>
@@ -19,8 +22,23 @@ const { peers, isConnected } = useRoom();
             </Button>
             isConnected {{ isConnected }}
         </header>
-        <PanelEditor v-if="activeTab === 0" />
-        <DoodleEditor v-else-if="activeTab === 1" />
+
+        <PanelEditor v-if="activeTab === 0" :canvas />
+        <DoodleEditor v-else-if="activeTab === 1" :canvas />
+
+        <main
+            @dragover.prevent="canvas.onCanvasDragOver"
+            @drop.prevent="canvas.onCanvasDrop"
+            class="bg-stone-50 border-4 border-black m-2 p-2 overflow-scroll grid place-items-center"
+        >
+            <canvas
+                ref="canvas-element"
+                :width="canvas.width"
+                :height="canvas.height"
+                class="border border-gray-600"
+            ></canvas>
+        </main>
+
         <aside class="flex flex-col gap-3 bg-stone-50 border-4 border-black m-2 p-2 overflow-scroll items-center">
             <span v-for="peer in peers">{{ peer }}</span>
         </aside>

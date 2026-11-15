@@ -1,6 +1,8 @@
 import { Canvas, FabricImage, getEnv, PatternBrush, PencilBrush } from 'fabric';
 import { onMounted, onUnmounted, reactive, watch, useTemplateRef } from 'vue';
 
+export type CanvasProps = ReturnType<typeof useCanvas>;
+
 export const useCanvas = () => {
     const height = 500;
     const width = Math.floor(height * (16 / 9));

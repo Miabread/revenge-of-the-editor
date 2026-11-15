@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import Button from './Button.vue';
-import { useCanvas } from './canvas.ts';
+import type { CanvasProps } from './canvas.ts';
 
-const { saveAsImage, brush, width, height } = useCanvas();
+interface Props {
+    canvas: CanvasProps;
+}
 
-brush.enabled = true;
+const { canvas } = defineProps<Props>();
+
+canvas.brush.enabled = true;
 
 const paletteButtons = [
     { key: 'width', value: 5, label: 'Small' },
@@ -27,13 +31,13 @@ const paletteButtons = [
 
 <template>
     <aside class="flex flex-col gap-3 bg-stone-50 border-4 border-black m-2 p-2 overflow-scroll">
-        <Button @click="saveAsImage">Save as Image</Button>
+        <Button @click="canvas.saveAsImage">Save as Image</Button>
         <div class="grid grid-cols-3 gap-3">
             <Button
                 v-for="(button, i) in paletteButtons"
                 :key="i"
-                @click="(brush[button.key] as any) = button.value"
-                :active="brush[button.key] === button.value"
+                @click="(canvas.brush[button.key] as any) = button.value"
+                :active="canvas.brush[button.key] === button.value"
                 class="aspect-square grid place-items-center"
             >
                 <div
@@ -45,8 +49,4 @@ const paletteButtons = [
             </Button>
         </div>
     </aside>
-
-    <main class="bg-stone-50 border-4 border-black m-2 p-2 overflow-scroll grid place-items-center">
-        <canvas ref="canvas-element" :width="width" :height="height" class="border border-gray-600"></canvas>
-    </main>
 </template>
