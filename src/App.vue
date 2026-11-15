@@ -169,13 +169,19 @@ const sendReady = async () => {
 const copyLinkToClipboard = () => {
     navigator.clipboard.writeText(window.location.href);
 };
+
+const tinLeftBg = `${import.meta.env.BASE_URL}assets/tin_left.png`;
+const tinRightBg = `${import.meta.env.BASE_URL}assets/tin_right.png`;
 </script>
 
 <template>
     <div
         class="special-background font-bangers h-screen w-screen overflow-hidden grid grid-cols-[1fr_3fr_1fr] grid-rows-1"
     >
-        <aside class="m-2 p-2 bg-[url('/assets/tin_left.png')] bg-center bg-no-repeat bg-size-[125%_100%]">
+        <aside
+            class="m-2 p-2 bg-center bg-no-repeat bg-size-[125%_100%]"
+            :style="{ backgroundImage: `url('${tinLeftBg}')` }"
+        >
             <PanelEditor v-if="gameState === 'panel'" :canvas />
             <DoodleEditor v-else-if="gameState === 'doodle'" :canvas />
             <PresentEditor v-else-if="gameState === 'present'" :canvas />
@@ -195,7 +201,8 @@ const copyLinkToClipboard = () => {
         </main>
 
         <aside
-            class="text-3xl text-center flex flex-col gap-3 m-2 p-2 overflow-scroll items-center bg-[url('/assets/tin_right.png')] bg-center bg-no-repeat bg-size-[125%_100%]"
+            class="text-3xl text-center flex flex-col gap-3 m-2 p-2 overflow-scroll items-center bg-center bg-no-repeat bg-size-[125%_100%]"
+            :style="{ backgroundImage: `url('${tinRightBg}')` }"
         >
             <h1 class="text-5xl text-shadow-lg text-shadow-white">{{ gameStateTitles[gameState] }}</h1>
 

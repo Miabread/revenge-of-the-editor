@@ -14,20 +14,20 @@ onMounted(() => {
 });
 
 const panelPieces = ref([
-    { url: '/assets/panel/panel1.png' },
-    { url: '/assets/panel/panel2.png' },
-    { url: '/assets/panel/panel3.png' },
-    { url: '/assets/panel/panel4.png' },
-    { url: '/assets/panel/cloud1.png' },
-    { url: '/assets/panel/cloud2.png' },
-    { url: '/assets/panel/sliced.png' },
-    { url: '/assets/bubble/bubble1.png' },
-    { url: '/assets/bubble/bubble2.png' },
-    { url: '/assets/bubble/bubble3.png' },
-    { url: '/assets/bubble/bubble4.png' },
-    { url: '/assets/bubble/bubble5.png' },
-    { url: '/assets/bubble/bubble6.png' },
-    { url: '/assets/bubble/bubble7.png' },
+    { url: './assets/panel/panel1.png' },
+    { url: './assets/panel/panel2.png' },
+    { url: './assets/panel/panel3.png' },
+    { url: './assets/panel/panel4.png' },
+    { url: './assets/panel/cloud1.png' },
+    { url: './assets/panel/cloud2.png' },
+    { url: './assets/panel/sliced.png' },
+    { url: './assets/bubble/bubble1.png' },
+    { url: './assets/bubble/bubble2.png' },
+    { url: './assets/bubble/bubble3.png' },
+    { url: './assets/bubble/bubble4.png' },
+    { url: './assets/bubble/bubble5.png' },
+    { url: './assets/bubble/bubble6.png' },
+    { url: './assets/bubble/bubble7.png' },
 ]);
 </script>
 
